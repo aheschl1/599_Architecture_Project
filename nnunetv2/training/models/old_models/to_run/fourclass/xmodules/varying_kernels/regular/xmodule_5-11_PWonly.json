@@ -1,0 +1,254 @@
+{
+    "LogKwargs":{
+        "group":"06_14_varying_kernel",
+        "architecture":"exactly nnunet",
+        "first relu":false,
+        "first pointwise":true,
+        "low_k":5,
+        "high_k":11
+    },
+    "Encoder":[
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":1,
+                "out_channels":32,
+                "dilations":[1, 1],
+                "kernel_sizes":[5, 11],
+                "stride":2,
+                "early_relu":false
+            },
+            "store_out":"skipped_0"
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":32,
+                "out_channels":32,
+                "stride":2,
+                "dilations":[1, 1],
+                "kernel_sizes":[5, 11],
+                "early_relu":false
+            }
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":32,
+                "out_channels":64,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[5, 11],
+                "early_relu":false
+            },
+            "store_out":"skipped_1"
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":64,
+                "out_channels":64,
+                "stride":2,
+                "dilations":[1, 1],
+                "kernel_sizes":[5, 11],
+                "early_relu":false
+            }
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":64,
+                "out_channels":128,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[5, 11],
+                "early_relu":false
+            },
+            "store_out":"skipped_2"
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":128,
+                "out_channels":128,
+                "stride":2,
+                "dilations":[1, 1],
+                "kernel_sizes":[5, 11],
+                "early_relu":false
+            }
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":128,
+                "out_channels":256,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[5, 11],
+                "early_relu":false
+            },
+            "store_out":"skipped_3"
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":256,
+                "out_channels":256,
+                "stride":2,
+                "dilations":[1, 1],
+                "kernel_sizes":[5, 11],
+                "early_relu":false
+            }
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":256,
+                "out_channels":512,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[5, 11],
+                "early_relu":false
+            },
+            "store_out":"skipped_4"
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}}
+    ],
+    "Middle":[
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":512,
+                "out_channels":512,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[5, 11],
+                "early_relu":false
+            }
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}}
+    ],
+    "Decoder":[
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":1024,
+                                "out_channels":256,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_4"}
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":512,
+                                "out_channels":128,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_3"}
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":256,
+                                "out_channels":64,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_2"}
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":128,
+                                "out_channels":32,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_1"}
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":64,
+                                "out_channels":3,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_0"}
+        }
+    ]
+}

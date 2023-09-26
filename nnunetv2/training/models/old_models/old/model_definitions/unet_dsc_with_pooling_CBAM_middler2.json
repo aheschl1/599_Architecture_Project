@@ -1,0 +1,153 @@
+{
+    "LogKwargs":{
+        "group":"CBAM",
+        "r":"2",
+        "location":"middle",
+        "architecture":"unet with pooling",
+        "base":"dsc",
+        "dsc components":4
+    },
+    "Encoder":[
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":1,
+                "out_channels":32
+            },
+            "store_out":"skipped_1"
+        },
+        {"ComponentClass":"ReLU", "args":{}},
+        {"ComponentClass":"MaxPool2d", "args":{"kernel_size":2}},
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":32,
+                "out_channels":64
+            },
+            "store_out":"skipped_2"
+        },
+        {"ComponentClass":"ReLU", "args":{}},
+        {"ComponentClass":"MaxPool2d", "args":{"kernel_size":2}},
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":64,
+                "out_channels":128
+            },
+            "store_out":"skipped_3"
+        },
+        {"ComponentClass":"ReLU", "args":{}},
+        {"ComponentClass":"MaxPool2d", "args":{"kernel_size":2}},
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":128,
+                "out_channels":256
+            },
+            "store_out":"skipped_4"
+        },
+        {"ComponentClass":"ReLU", "args":{}}
+        
+    ],
+    "Middle":[
+        {
+            "ComponentClass":"CBAM",
+            "args":{
+                "channels":256,
+                "r":2,
+                "stride":1
+            }
+        },
+        {"ComponentClass":"ReLU", "args":{}}
+    ],
+    "Decoder":[
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":512,
+                                "out_channels":128,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_4"}
+        },
+        {"ComponentClass":"ReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links2",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":256,
+                                "out_channels":64,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_3":"skipped_3"}
+        },
+        {"ComponentClass":"ReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links3",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":128,
+                                "out_channels":32,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_2":"skipped_2"}
+        },
+        {"ComponentClass":"ReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links5",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":64,
+                                "out_channels":2,
+                                "kernel_size":1,
+                                "stride":1
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_1":"skipped_1"}
+
+        }
+    ]
+}

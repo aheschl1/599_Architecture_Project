@@ -1,0 +1,11 @@
+{
+    "folder_with_segs_from_prev_stage": null,
+    "list_of_lists_or_source_folder": "/work/vision_lab/KITS23_DATASETS/SegData/nnUNet_raw/Dataset031_Masses/imagesTr",
+    "num_parts": 1,
+    "num_processes_preprocessing": 2,
+    "num_processes_segmentation_export": 2,
+    "output_folder_or_list_of_truncated_output_files": "/home/andrew.heschl/Documents/Seg3D/nnunetv2/inference/our_pipeline/mass_results",
+    "overwrite": false,
+    "part_id": 0,
+    "save_probabilities": false
+}

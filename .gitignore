@@ -1,0 +1,6 @@
+/home/student/andrew/Documents/Seg3D/nnunetv2/inference/kidney_results_rough/*
+nnunetv2/inference/kidney_results_rough/*
+nnunetv2/inference/test_results/case_00031_0000.nii.gz
+nnunetv2/inference/*/**.nii.gz
+nnunetv2/**/*.nii.gz
+nnunetv2/**/*.pth

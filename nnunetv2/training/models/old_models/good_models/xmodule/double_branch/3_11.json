@@ -1,0 +1,270 @@
+{
+    "LogKwargs":{
+        "group":"XModule Double Branch",
+        "architecture":"nnunet",
+        "base":"XModule",
+        "Decoder":"DSC",
+        "max features":512,
+        "K First":3,
+        "K Second":11
+    },
+    "Encoder":[
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":1,
+                "out_channels":32,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            },
+            "store_out":"skipped_0"
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":32}},
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":32,
+                "out_channels":32,
+                "stride":2,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            }
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":32}},
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":32,
+                "out_channels":64,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            },
+            "store_out":"skipped_1"
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":64}},
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":64,
+                "out_channels":64,
+                "stride":2,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            }
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":64}},
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":64,
+                "out_channels":128,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            },
+            "store_out":"skipped_2"
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":128}},
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":128,
+                "out_channels":128,
+                "stride":2,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            }
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":128}},
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":128,
+                "out_channels":256,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            },
+            "store_out":"skipped_3"
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":256}},
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":256,
+                "out_channels":256,
+                "stride":2,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            }
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":256}},
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":256,
+                "out_channels":512,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            },
+            "store_out":"skipped_4"
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":512}},
+        {"ComponentClass":"LeakyReLU", "args":{}}
+    ],
+    "Middle":[
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":512,
+                "out_channels":512,
+                "stride":2,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            }
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":512}},
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"XModule",
+            "args":{
+                "in_channels":512,
+                "out_channels":512,
+                "stride":1,
+                "dilations":[1, 1],
+                "kernel_sizes":[3, 11]
+            }
+        },
+        {"ComponentClass":"InstanceNorm", "args":{"num_features":512}},
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"ConvTranspose",
+            "args":{
+                "in_channels":512,
+                "out_channels":512,
+                "kernel_size":2,
+                "stride":2
+            }
+        }
+
+    ],
+    "Decoder":[
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"DecoderBlock",
+                            "args":{
+                                "in_channels":512,
+                                "out_channels":256,
+                                "conv_op":"DepthWiseSeparableConv"
+
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_4"}
+        },
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"DecoderBlock",
+                            "args":{
+                                "in_channels":256,
+                                "out_channels":128,
+                                "conv_op":"DepthWiseSeparableConv"
+
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_3"}
+        },
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"DecoderBlock",
+                            "args":{
+                                "in_channels":128,
+                                "out_channels":64,
+                                "conv_op":"DepthWiseSeparableConv"
+
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_2"}
+        },
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"DecoderBlock",
+                            "args":{
+                                "in_channels":64,
+                                "out_channels":32,
+                                "conv_op":"DepthWiseSeparableConv"
+
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_1"}
+        },
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"DecoderBlock",
+                            "args":{
+                                "in_channels":32,
+                                "out_channels":3,
+                                "last_layer":true,
+                                "conv_op":"DepthWiseSeparableConv"
+
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_0"}
+        }
+    ]
+}

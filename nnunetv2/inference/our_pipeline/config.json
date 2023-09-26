@@ -1,0 +1,15 @@
+{
+    "dataset_tumour":"Dataset032_Tumour",
+    "dataset_kidney":"Dataset030_Kidney",
+    "dataset_mass":"Dataset031_Masses",
+    "kidney_results":"kidney_results",
+    "mass_results":"mass_results",
+    "tumour_results":"tumour_results",
+    "combined_output":"validation_results",
+    "rechunked_mass":"rechunked_mass",
+    "rechunked_tumour":"rechunked_tumour",
+    "kidney_roi_dilation":11,
+    "mass_dilation":11,
+    "kidney_chunk_csv":"chunk_management/kidney_chunks.csv",
+    "inference":"inference"
+}

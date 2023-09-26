@@ -1,0 +1,224 @@
+{
+    "LogKwargs":{
+        "group":"CBAM",
+        "r":"4",
+        "location":"middle",
+        "architecture":"exactly nnunet",
+        "base":"dsc",
+        "dsc components":9
+    },
+    "Encoder":[
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":1,
+                "out_channels":32,
+                "stride":2
+            },
+            "store_out":"skipped_0"
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":32,
+                "out_channels":32,
+                "stride":2
+            }
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":32,
+                "out_channels":64,
+                "stride":1
+            },
+            "store_out":"skipped_1"
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":64,
+                "out_channels":64,
+                "stride":2
+            }
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":64,
+                "out_channels":128,
+                "stride":1
+            },
+            "store_out":"skipped_2"
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":128,
+                "out_channels":128,
+                "stride":2
+            }
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":128,
+                "out_channels":256,
+                "stride":1
+            },
+            "store_out":"skipped_3"
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":256,
+                "out_channels":256,
+                "stride":2
+            }
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"DepthWiseSeparableConv",
+            "args":{
+                "in_channels":256,
+                "out_channels":512,
+                "stride":1
+            },
+            "store_out":"skipped_4"
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}}
+    ],
+    "Middle":[
+        {
+            "ComponentClass":"CBAM",
+            "args":{
+                "channels":512,
+                "r":4,
+                "stride":1
+            }
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}}
+    ],
+    "Decoder":[
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":1024,
+                                "out_channels":256,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_4"}
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":512,
+                                "out_channels":128,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_3"}
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":256,
+                                "out_channels":64,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_2"}
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":128,
+                                "out_channels":32,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_1"}
+        },
+        {"ComponentClass":"LeakyReLU", "args":{}},
+        {
+            "ComponentClass":"Linker",
+            "args":{
+                "mode":"concat",
+                "module":{
+                    "Tag":"Links",
+                    "Children":[
+                        {
+                            "ComponentClass":"ConvTranspose2d",
+                            "args":{
+                                "in_channels":64,
+                                "out_channels":2,
+                                "kernel_size":2,
+                                "stride":2
+                            }
+                        }
+                    ]
+                }
+            },
+            "forward_in":{"skipped_4":"skipped_0"}
+        }
+    ]
+}
