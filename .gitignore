@@ -4,3 +4,8 @@ nnunetv2/inference/test_results/case_00031_0000.nii.gz
 nnunetv2/inference/*/**.nii.gz
 nnunetv2/**/*.nii.gz
 nnunetv2/**/*.pth
+/.idea/.gitignore
+/.idea/599_Architecture_Project.iml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
