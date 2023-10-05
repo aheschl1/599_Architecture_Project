@@ -3,7 +3,8 @@ What I changed in this pipeline:
 1. Added a custom trainer under the nnUNetTrainer folder.
 2. Custom models in the training/models folder.
 3. Dynamic utilities and such.
-4. Other stuff.
+4. Inference for KITS Project
+5. Other stuff.
 
 # Welcome to the new nnU-Net!
 
