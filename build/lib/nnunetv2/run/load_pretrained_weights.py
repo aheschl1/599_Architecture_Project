@@ -32,6 +32,7 @@ def load_pretrained_weights(network, fname, verbose=False):
 
     model_dict = mod.state_dict()
     print(model_dict.keys())
+
     # verify that all but the segmentation layers have the same shape
     for key, _ in model_dict.items():
         if all([i not in key for i in skip_strings_in_pretrained]):

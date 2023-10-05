@@ -43,7 +43,7 @@ def remove_small_connected(arr: np.array) -> np.array:
         volume = sum(arr, labels=labeled_array, index=i)
         volumes[i] = volume
 
-    threshold = np.sum(arr) // 4 # 20000
+    threshold = np.sum(arr) // 4
     mask_under_threshold = volumes < threshold
     labeled_array[mask_under_threshold[labeled_array]] = 0
     labeled_array[labeled_array != 0] = 1

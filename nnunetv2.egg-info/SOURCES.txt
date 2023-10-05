@@ -141,9 +141,9 @@ nnunetv2/training/models/__init__.py
 nnunetv2/training/models/constant.py
 nnunetv2/training/models/model_builder.py
 nnunetv2/training/models/model_generator.py
-nnunetv2/training/models/task_splitter.py
 nnunetv2/training/models/test_models.py
 nnunetv2/training/models/utils.py
+nnunetv2/training/models/archive/old_utils.py
 nnunetv2/training/nnUNetTrainer/__init__.py
 nnunetv2/training/nnUNetTrainer/nnUNetTrainer.py
 nnunetv2/training/nnUNetTrainer/ourTrainer.py

@@ -24,7 +24,7 @@ class MassPredictionHandler(FileSystemEventHandler):
     """
 
     def __init__(self, observer: Observer, folder: str, tumour_dataset_images: str, config: dict,
-                 total_expected_cases: int, dilation_device:str = "cuda:0") -> None:
+                 total_expected_cases: int, dilation_device:str = "cuda:1") -> None:
         super().__init__()
         self.folder = folder
         self.tumour_dataset_images = tumour_dataset_images
@@ -38,10 +38,14 @@ class MassPredictionHandler(FileSystemEventHandler):
         """
         A new mass ROI has been predicted.
         """
+        # try:
+        if 'nii.gz' not in file_path:
+            return False
+        
         print(f"Working on {file_path}")
         case = file_path.split('/')[-1].split('.')[0].split('_')[-1]
 
-        target_path = f"/home/andrew.heschl/Documents/Seg3D/nnunetv2/inference/our_pipeline/inference/mass_inference/case_{case}_0000.nii.gz"
+        target_path = f"/home/student/andrew/Documents/Seg3D/nnunetv2/inference/our_pipeline/inference/mass_inference/case_{case}_0000.nii.gz"
         target = sitk.ReadImage(target_path)
         target_array = sitk.GetArrayFromImage(target)
         # Target array is the image that we want to blank out. Target is the METADATA REFERENCE.
@@ -108,7 +112,7 @@ def predict_data(config: dict, prediction_path: str):
         use_gaussian=True,
         use_mirroring=True,
         perform_everything_on_gpu=True,
-        device=torch.device('cuda:0'),
+        device=torch.device('cuda:1'),
         verbose=False,
         verbose_preprocessing=False,
         allow_tqdm=True
@@ -124,7 +128,7 @@ def predict_data(config: dict, prediction_path: str):
         list_of_lists_or_source_folder=f"{ROOT_DIR}/{config[ConfigKeys.INFERENCE.value]}/mass_inference",
         output_folder_or_list_of_truncated_output_files=prediction_path,
         save_probabilities=False, overwrite=False,
-        num_processes_preprocessing=2, num_processes_segmentation_export=2,
+        num_processes_preprocessing=1, num_processes_segmentation_export=1,
         folder_with_segs_from_prev_stage=None, num_parts=1, part_id=0
     )
 
@@ -144,6 +148,8 @@ if __name__ == '__main__':
             args=(configs, prediction_path)
         )
         predict_process.start()
+
+    # predict_data(configs, prediction_path)
 
     observer = Observer()
     event_handler = MassPredictionHandler(

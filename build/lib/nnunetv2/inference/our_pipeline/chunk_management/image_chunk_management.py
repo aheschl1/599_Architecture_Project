@@ -284,7 +284,7 @@ class ImageCropManagement:
         """
         For writting an image from the background.
         """
-        print("Writting", path)
+        # print("Writting", path)
         sitk.WriteImage(image, path)
 
     @property

@@ -3,11 +3,8 @@ from dynamic_network_architectures.building_blocks.helper import get_matching_in
 from dynamic_network_architectures.initialization.weight_init import init_last_bn_before_add_to_0
 from nnunetv2.utilities.network_initialization import InitWeights_He
 from nnunetv2.utilities.plans_handling.plans_handler import ConfigurationManager, PlansManager
-from nnunetv2.training.models.unet_subclasses.PlainConvUNetCCSkipped import PlainConvUNetSkipOperationSkipped
 from torch import nn
-from nnunetv2.training.models.utils import EfficientCC_Wrapper, SpatialGatedConv2d, CC_Wrapper3d
-from nnunetv2.training.models.unet_subclasses.PlainConvUNetCCSkipped import PlainConvUNetSkipOperationSkipped, PlainConvUNetSkipOperationSkipped3d
-from nnunetv2.training.models.utils import MCDropout, ModuleStateController
+
 
 def get_network_from_plans(plans_manager: PlansManager,
                            dataset_json: dict,
@@ -28,10 +25,6 @@ def get_network_from_plans(plans_manager: PlansManager,
     label_manager = plans_manager.get_label_manager(dataset_json)
 
     segmentation_network_class_name = configuration_manager.UNet_class_name
-
-    if len(configuration_manager.patch_size) == 3:
-        ModuleStateController.set_state(ModuleStateController.THREE_D)
-
     mapping = {
         'PlainConvUNet': PlainConvUNet,
         'ResidualEncoderUNet': ResidualEncoderUNet
@@ -41,7 +34,7 @@ def get_network_from_plans(plans_manager: PlansManager,
             'conv_bias': True,
             'norm_op': get_matching_instancenorm(conv_op),
             'norm_op_kwargs': {'eps': 1e-5, 'affine': True},
-            'dropout_op': MCDropout, 'dropout_op_kwargs': {'p':configuration_manager.dropout_p},
+            'dropout_op': None, 'dropout_op_kwargs': None,
             'nonlin': nn.LeakyReLU, 'nonlin_kwargs': {'inplace': True},
         },
         'ResidualEncoderUNet': {
@@ -65,9 +58,6 @@ def get_network_from_plans(plans_manager: PlansManager,
         'n_conv_per_stage_decoder': configuration_manager.n_conv_per_stage_decoder
     }
     # network class name!!
-    if 'conv_op' in kwargs[segmentation_network_class_name]:
-        conv_op = kwargs[segmentation_network_class_name].pop('conv_op')
-
     model = network_class(
         input_channels=num_input_channels,
         n_stages=num_stages,

@@ -46,7 +46,6 @@ from nnunetv2.training.models.utils import ModuleStateController
 import threading
 from multiprocessing.pool import ThreadPool
 import glob
-from multiprocessing.pool import ThreadPool
 
 class PredictionSave(threading.Thread):
     def __init__(self, path, image):
@@ -214,6 +213,7 @@ class mcDropoutPredictor(nnUNetPredictor):
         each element returned by data_iterator must be a dict with 'data', 'ofile' and 'data_properites' keys!
         If 'ofile' is None, the result will be returned instead of written to a file
         """
+        thread_queue = []
         for preprocessed in data_iterator:
             data = preprocessed['data']
             if isinstance(data, str):
@@ -234,29 +234,13 @@ class mcDropoutPredictor(nnUNetPredictor):
             
             # Initialize a list to hold the entropy sum for each class
             entropy_manager = EntropyManager(output)
+            prediction_manager = PredictionManager(output, self.label_manager)
+
             threads_container = []
             for w in range(iters):
                 print(f"Working on iteration {w +1}/{iters}")
                 prediction = self.predict_logits_from_preprocessed_data(data)
 
-                seg, prob = convert_predicted_logits_to_segmentation_with_correct_shape(
-                    prediction, self.plans_manager, self.configuration_manager, self.label_manager, properties,
-                    return_probabilities=True, numpy_type=False
-                )
-
-                threads_container.append(EntropyNewProbThread(prob, entropy_manager))
-                threads_container[-1].start()
-
-                if w == 0:
-                    threads_container.append(PredictionSave(ofile, seg))
-                    threads_container[-1].start()
-
-            for thread in threads_container:
-                thread.join()
-            
-            t = EntropyDoneThread(ofile.split('/')[-1].split('_')[1], entropy_manager)
-            t.start()
-                            
                 seg, prob = convert_predicted_logits_to_segmentation_with_correct_shape(
                     prediction, self.plans_manager, self.configuration_manager, self.label_manager, properties,
                     return_probabilities=True, numpy_type=False
@@ -379,7 +363,7 @@ class PredictorTask(threading.Thread):
                                  self.output,
                                  save_probabilities=False, overwrite=False,
                                  num_processes_preprocessing=4, num_processes_segmentation_export=4,
-                                 folder_with_segs_from_prev_stage=None, num_parts=1, part_id=0, iters=10)
+                                 folder_with_segs_from_prev_stage=None, num_parts=1, part_id=0, iters=20)
 
 
 
@@ -389,7 +373,7 @@ if __name__ == '__main__':
 
     #=============================================START KIDNEY==========================================
     predictor_kidney = mcDropoutPredictor(
-        tile_step_size=1,
+        tile_step_size=0.5,
         use_gaussian=True,
         use_mirroring=True,
         perform_everything_on_gpu=True,
@@ -407,7 +391,7 @@ if __name__ == '__main__':
     kidney_task.start()
     #=============================================START MASSES==========================================
     predictor_masses = mcDropoutPredictor(
-        tile_step_size=1,
+        tile_step_size=0.5,
         use_gaussian=True,
         use_mirroring=True,
         perform_everything_on_gpu=True,
@@ -428,7 +412,7 @@ if __name__ == '__main__':
     masses_task.join()
     #=============================================START TUMOUR==========================================
     predictor_tumour = mcDropoutPredictor(
-        tile_step_size=1,
+        tile_step_size=0.5,
         use_gaussian=True,
         use_mirroring=True,
         perform_everything_on_gpu=True,
@@ -455,9 +439,5 @@ if __name__ == '__main__':
         join(nnUNet_results, 'Dataset028_Masses/predictions'), 
         join(nnUNet_results, 'Dataset029_Tumour/predictions')
     )
-    predictor.predict_from_files(join(nnUNet_raw, 'Dataset021_All/imagesTr'),
-                                 output,
-                                 save_probabilities=False, overwrite=False,
-                                 num_processes_preprocessing=2, num_processes_segmentation_export=2,
-                                 folder_with_segs_from_prev_stage=None, num_parts=1, part_id=0, iters=10)
+    combiner.combine(final_prediction_output)
                                  

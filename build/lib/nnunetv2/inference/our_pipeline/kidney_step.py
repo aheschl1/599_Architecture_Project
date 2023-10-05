@@ -35,7 +35,7 @@ class KidneyPredictionHandler(FileSystemEventHandler):
             config: dict,
             observer: Observer,
             total_expected_cases=489,
-            dilation_device: str = 'cuda:0'
+            dilation_device: str = 'cuda'
     ) -> None:
         super().__init__()
         self.folder = folder
@@ -65,10 +65,12 @@ class KidneyPredictionHandler(FileSystemEventHandler):
         A new kidney ROI has been predicted. Collects the case name from the file, and then overwrites
         the mass dataset with the new raw images.
         """
+        if('json' in file_path):
+            return
         print(f"Working on {file_path}")
         case = file_path.split("/")[-1].split(".")[0].split("_")[-1]
         # target path is the file where we grab the raw image to put in the mass dataset.
-        target_path = f"{NNUNET_RAW}/{self.config[ConfigKeys.DATASET_KIDNEY.value]}/imagesTr/case_{case}_0000.nii.gz"
+        target_path = f"/home/student/andrew/Documents/Seg3D/nnunetv2/inference/our_pipeline/inference/raw/case_{case}_0000.nii.gz"
         target = sitk.ReadImage(target_path)
         if self.crop_management is None:
             self._setup_crop_management(target)
@@ -139,7 +141,7 @@ class KidneyPredictionHandler(FileSystemEventHandler):
         """
         Given a numpy array, returns a new one which has been dilated with a cubed kernel of the size in config file.
         """
-        #cpu version
+        #cuda version
         # dilation = self.config[ConfigKeys.KIDNEY_DILATION.value]
         # struct_element = np.ones((dilation, dilation, dilation), dtype=bool)
         # dilated_mask = binary_dilation(mask, structure=struct_element)
@@ -172,7 +174,7 @@ def predict_data(config: dict, prediction_path: str):
         use_gaussian=True,
         use_mirroring=True,
         perform_everything_on_gpu=True,
-        device=torch.device("cuda:0"),
+        device=torch.device("cuda"),
         verbose=False,
         verbose_preprocessing=False,
         allow_tqdm=True,
@@ -184,13 +186,14 @@ def predict_data(config: dict, prediction_path: str):
         use_folds=(0,),
         checkpoint_name="checkpoint_best.pth",
     )
+    print(f"{ROOT_DIR}/{config[ConfigKeys.INFERENCE.value]}/raw")
     predictor.predict_from_files(
-        list_of_lists_or_source_folder=f"{ROOT_DIR}/{config[ConfigKeys.INFERENCE.value]}",
+        list_of_lists_or_source_folder=f"{ROOT_DIR}/{config[ConfigKeys.INFERENCE.value]}/raw",
         output_folder_or_list_of_truncated_output_files=prediction_path,
         save_probabilities=False,
         overwrite=False,
-        num_processes_preprocessing=2,
-        num_processes_segmentation_export=2,
+        num_processes_preprocessing=16,
+        num_processes_segmentation_export=16,
         folder_with_segs_from_prev_stage=None,
         num_parts=1,
         part_id=0,
@@ -199,8 +202,9 @@ def predict_data(config: dict, prediction_path: str):
 
 if __name__ == "__main__":
     configs = get_configurations()
+    # print(ROOT_DIR)
 
-    do_predictions = True
+    do_predictions = False
     prediction_path = f"{ROOT_DIR}/{configs[ConfigKeys.INFERENCE.value]}/kidney_predictions"
 
     if do_predictions:
@@ -224,7 +228,7 @@ if __name__ == "__main__":
         tumour_dataset_labels=None,
         config=configs,
         observer=observer,
-        total_expected_cases = 83
+        total_expected_cases = 1
     )
 
     observer.schedule(event_handler, prediction_path, recursive=False)
