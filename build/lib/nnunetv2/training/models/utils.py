@@ -149,7 +149,6 @@ class DecoderBlock(nn.Module):
         conv_op = my_import(conv_op)
         transp_op = ModuleStateController.transp_op()
         norm_op = ModuleStateController.norm_op()
-        dropout_op = ModuleStateController.mcdropout_op()
 
         pad = (kernel_size - 1) // 2 * dilation if pad == 'default' else int(pad)
         self.conv1 = nn.Sequential(
@@ -180,9 +179,6 @@ class DecoderBlock(nn.Module):
                 kernel_size=transpose_kernel
             )
             self.conv2.append(
-                dropout_op(dropout_p)
-            )
-            self.conv2.append(
                 norm_op(num_features=out_channels)
             )
             self.conv2.append(
@@ -196,6 +192,43 @@ class DecoderBlock(nn.Module):
         if not self.last_layer:
             return self.transpose(x)
         return x
+
+class PolyActivation(nn.Module):
+    def __init__(self, order: int):
+        super().__init__()
+        self.order = order
+    def forward(self, x):
+        return torch.power(x, self.order)
+
+class PolyBlock(nn.Module):
+    def __init__(self, 
+            order: int, 
+            in_channels: int, 
+            out_channels: int, 
+            conv: str = "Conv", 
+            kernel_size=3,
+            stride: int = 1
+        ):
+        pad = (kernel_size-1)//2
+        assert order > 0, "order must be > 0"
+        self.layers = nn.ModuleList()
+        conv_op = my_import(conv)
+        for i in range(1, order+1):
+            seq = nn.Sequential([
+                PolyActivation(order),
+                conv_op(in_channels=in_channels, out_channels=out_channels, padding=pad)
+            ])
+            self.layers.append(seq)
+    
+    def forward(self, x):
+        output = None
+        for layer in self.layers:
+            out = layer(x)
+            if output is None:
+                output = out
+                continue
+            output = torch.add(output, out)
+        return output
 
 class InstanceNorm(nn.Module):
     def __init__(self, num_features):

@@ -11,7 +11,7 @@ if mode == "3d":
 else:
     x = torch.rand((56, 1, 256, 256))
 
-for path in glob.glob('/home/andrewheschl/Documents/Seg3D/nnunetv2/training/models/mc_dropout_models/xmodules/**/*.json', recursive=True):
+for path in glob.glob('/home/andrew.heschl/Documents/599_Architecture_Project/nnunetv2/training/models/599_models/*.json', recursive=True):
     module = ModelGenerator(path)
     #summary(module.get_model().cuda(), (1, 128, 128, 128))
     try:

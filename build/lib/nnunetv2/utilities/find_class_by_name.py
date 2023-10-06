@@ -27,6 +27,9 @@ def my_import(class_name:str, dropout_package:str = 'torch.nn'):
     if class_name == 'UpsamplingConv':
         from nnunetv2.training.models.utils import UpsamplingConv
         return UpsamplingConv
+    elif class_name == "PolyBlock":
+        from nnunetv2.training.models.utils import PolyBlock
+        return PolyBlock
     elif class_name == 'ConvPixelShuffle':
         from nnunetv2.training.models.utils import ConvPixelShuffle
         return ConvPixelShuffle
