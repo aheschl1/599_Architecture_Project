@@ -129,7 +129,7 @@ class nnUNetTrainer(object):
         self.output_folder_base = join(nnUNet_results, self.plans_manager.dataset_name,
                                        self.__class__.__name__ + '__' + self.plans_manager.plans_name + "__" + configuration) \
             if nnUNet_results is not None else None
-        import datetime
+        from datetime import datetime
         now = datetime.now()
         uniqueid = now.strftime("%d/%m/%Y/%H:%M:%S")
 
