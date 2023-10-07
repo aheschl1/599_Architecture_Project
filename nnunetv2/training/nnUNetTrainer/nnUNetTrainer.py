@@ -131,7 +131,7 @@ class nnUNetTrainer(object):
             if nnUNet_results is not None else None
         from datetime import datetime
         now = datetime.now()
-        uniqueid = now.strftime("%d/%m/%Y/%H:%M:%S")
+        uniqueid = now.strftime("%d_%m_%Y_%H_%M_%S")
 
         self.output_folder = join(self.output_folder_base, f'fold_{fold}/{uniqueid}')
 
