@@ -120,6 +120,12 @@ def my_import(class_name:str, dropout_package:str = 'torch.nn'):
     elif class_name == "MCDropout":
         from nnunetv2.training.models.utils import MCDropout
         return MCDropout 
+    elif class_name == "PolyBlock_Sum":
+        from nnunetv2.training.models.utils import PolyBlock_Sum
+        return PolyBlock_Sum
+    elif class_name == "PolyBlock_Factor":
+        from nnunetv2.training.models.utils import PolyBlock_Factor
+        return PolyBlock_Factor
         
     else:
         module = importlib.import_module(dropout_package)

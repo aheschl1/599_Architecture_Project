@@ -12,11 +12,5 @@
 source ~/software/init-conda
 conda activate torch_env
 
-CUDA_VISIBLE_DEVICES=0 nnUNetv2_train 29 2d 0 -tr ourTrainer -model /home/andrew.heschl/Documents/599_Architecture_Project/nnunetv2/training/models/599_models/nnunet_poly.json &
-CUDA_VISIBLE_DEVICES=1 nnUNetv2_train 29 2d 0 -tr ourTrainer -model /home/andrew.heschl/Documents/599_Architecture_Project/nnunetv2/training/models/599_models/nnunet_poly_norelu.json
-
-wait 
-
-CUDA_VISIBLE_DEVICES=0 nnUNetv2_train 29 2d 0 -tr ourTrainer -model /home/andrew.heschl/Documents/599_Architecture_Project/nnunetv2/training/models/599_models/nnunet_xmodule.json &
-CUDA_VISIBLE_DEVICES=1 nnUNetv2_train 29 2d 0 -tr ourTrainer -model /home/andrew.heschl/Documents/599_Architecture_Project/nnunetv2/training/models/599_models/nnunet.json
-
+CUDA_VISIBLE_DEVICES=0 nnUNetv2_train 29 2d 0 -tr ourTrainer -model /home/andrew.heschl/Documents/599_Architecture_Project/nnunetv2/training/models/599_models/poly_v2/fact_poly.json &
+CUDA_VISIBLE_DEVICES=1 nnUNetv2_train 29 2d 0 -tr ourTrainer -model /home/andrew.heschl/Documents/599_Architecture_Project/nnunetv2/training/models/599_models/poly_v2/sum_poly.json

@@ -130,8 +130,9 @@ class nnUNetTrainer(object):
                                        self.__class__.__name__ + '__' + self.plans_manager.plans_name + "__" + configuration) \
             if nnUNet_results is not None else None
         from datetime import datetime
+        import uuid
         now = datetime.now()
-        uniqueid = now.strftime("%d_%m_%Y_%H_%M_%S")
+        uniqueid = now.strftime(f"%d_%m_%Y_%H_%M_{str(uuid.uuid4())[:5]}")
 
         self.output_folder = join(self.output_folder_base, f'fold_{fold}/{uniqueid}')
 

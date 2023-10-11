@@ -231,6 +231,92 @@ class PolyBlock(nn.Module):
             output = torch.add(output, out)
         return output
 
+class PolyBrancher(nn.Module):
+    def __init__(self, in_channels) -> None:
+        super().__init__()
+        self.relu = nn.ReLU()
+        self.ch_max_pool = nn.MaxPool3d((in_channels, 1, 1), stride=(in_channels, 1, 1))
+    def forward(self, x):
+        relu_x = self.relu(x)
+        max_mask = self.ch_max_pool(x)
+        return torch.div(relu_x, max_mask)
+
+class PolyBlock_Sum(nn.Module):
+    def __init__(self, 
+            order: int, 
+            in_channels: int, 
+            out_channels: int, 
+            conv: str = "Conv", 
+            kernel_size=3,
+            stride: int = 1
+        ):
+        super().__init__()
+        pad = (kernel_size-1)//2
+        assert order > 0, "order must be > 0"
+        self.layers = nn.ModuleList()
+        conv_op = my_import(conv)
+        for i in range(1, order+1):
+            modules = [
+                PolyActivation(order),
+                conv_op(in_channels=in_channels, out_channels=out_channels, padding=pad, stride=stride)
+            ]
+            if i > 1:
+                modules.append(
+                    PolyBrancher(in_channels=out_channels)
+                )
+            seq = nn.Sequential(*modules)
+            self.layers.append(seq)
+    
+    def forward(self, x):
+        output = None
+        for layer in self.layers:
+            out = layer(x)
+            if output is None:
+                output = out
+                continue
+            output = torch.add(output, out)
+        return output
+    
+class PolyBlock_Factor(nn.Module):
+    def __init__(self, 
+            order: int, 
+            in_channels: int, 
+            out_channels: int, 
+            conv: str = "Conv", 
+            kernel_size=3,
+            stride: int = 1
+        ):
+        super().__init__()
+        pad = (kernel_size-1)//2
+        assert order > 0, "order must be > 0"
+        self.layers = nn.ModuleList()
+        conv_op = my_import(conv)
+        for i in range(1, order+1):
+            modules = [
+                PolyActivation(order),
+                conv_op(in_channels=in_channels, out_channels=out_channels, padding=pad, stride=stride)
+            ]
+            if i > 1:
+                modules.append(
+                    PolyBrancher(in_channels=out_channels)
+                )
+            seq = nn.Sequential(*modules)
+            self.layers.append(seq)
+    
+    def forward(self, x):
+        first = None
+        output = None
+        for i, layer in enumerate(self.layers):
+            out = layer(x)
+            if i == 0:
+                first = out
+                continue
+            if output is None:
+                output = out
+                continue
+            output = torch.add(output, out)
+        return first * output
+
 class InstanceNorm(nn.Module):
     def __init__(self, num_features):
         super().__init__()
