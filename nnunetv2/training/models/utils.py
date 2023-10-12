@@ -232,13 +232,14 @@ class PolyBlock(nn.Module):
         return output
 
 class PolyBrancher(nn.Module):
-    def __init__(self, in_channels) -> None:
+    def __init__(self, in_channels, epsilon=1e-8) -> None:
         super().__init__()
+        self.epsilon = epsilon
         self.relu = nn.ReLU()
         self.ch_max_pool = nn.MaxPool3d((in_channels, 1, 1), stride=(in_channels, 1, 1))
     def forward(self, x):
         relu_x = self.relu(x)
-        max_mask = self.ch_max_pool(x)
+        max_mask = self.ch_max_pool(x) + self.epsilon
         return torch.div(relu_x, max_mask)
 
 class PolyBlock_Sum(nn.Module):

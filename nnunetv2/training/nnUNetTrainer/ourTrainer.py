@@ -86,7 +86,21 @@ class ourTrainer(nnUNetTrainer):
             fn_hard = fn_hard[1:]
 
         return {'loss': l.detach().cpu().numpy(), 'tp_hard': tp_hard, 'fp_hard': fp_hard, 'fn_hard': fn_hard}
-    
+        
+    def _build_loss(self):
+        if self.label_manager.has_regions:
+            loss = DC_and_BCE_loss({},
+                                {'batch_dice': self.configuration_manager.batch_dice,
+                                    'do_bg': True, 'smooth': 1e-5, 'ddp': self.is_ddp},
+                                use_ignore_label=self.label_manager.ignore_label is not None,
+                                dice_class=MemoryEfficientSoftDiceLoss)
+        else:
+            loss = DC_and_CE_loss({'batch_dice': self.configuration_manager.batch_dice,
+                                'smooth': 1e-5, 'do_bg': False, 'ddp': self.is_ddp}, {}, weight_ce=1, weight_dice=1,
+                                ignore_label=self.label_manager.ignore_label,
+                                dice_class=MemoryEfficientSoftDiceLoss)
+        return loss
+
     def _get_deep_supervision_scales(self):
         return None
 
