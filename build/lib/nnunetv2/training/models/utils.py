@@ -200,122 +200,42 @@ class PolyActivation(nn.Module):
     def forward(self, x):
         return torch.pow(x, self.order)
 
+class PolyWrapper(nn.Module):
+  def __init__(self, in_channels, out_channels, order, stride: int = 1):
+    super().__init__()
+    self.branches = nn.ModuleList([
+        PolyBlock(in_channels, out_channels, o, stride) for o in range(1, order+1)
+    ])
+  def forward(self, x):
+    out = None
+    mean = torch.mean(x)
+    x = torch.sub(x, mean)
+    # x -= mean
+    for mod in self.branches:
+      if out is None:
+        out = mod(x)
+      else:
+        out = torch.add(out, mod(x))
+    return out
+
 class PolyBlock(nn.Module):
-    def __init__(self, 
-            order: int, 
-            in_channels: int, 
-            out_channels: int, 
-            conv: str = "Conv", 
-            kernel_size=3,
-            stride: int = 1
-        ):
-        super().__init__()
-        pad = (kernel_size-1)//2
-        assert order > 0, "order must be > 0"
-        self.layers = nn.ModuleList()
-        conv_op = my_import(conv)
-        for i in range(1, order+1):
-            seq = nn.Sequential(
-                PolyActivation(order),
-                conv_op(in_channels=in_channels, out_channels=out_channels, padding=pad, stride=stride)
-            )
-            self.layers.append(seq)
-    
-    def forward(self, x):
-        output = None
-        for layer in self.layers:
-            out = layer(x)
-            if output is None:
-                output = out
-                continue
-            output = torch.add(output, out)
-        return output
-
-class PolyBrancher(nn.Module):
-    def __init__(self, in_channels) -> None:
-        super().__init__()
-        self.relu = nn.ReLU()
-        self.ch_max_pool = nn.MaxPool3d((in_channels, 1, 1), stride=(in_channels, 1, 1))
-    def forward(self, x):
-        relu_x = self.relu(x)
-        max_mask = self.ch_max_pool(x)
-        return torch.div(relu_x, max_mask)
-
-class PolyBlock_Sum(nn.Module):
-    def __init__(self, 
-            order: int, 
-            in_channels: int, 
-            out_channels: int, 
-            conv: str = "Conv", 
-            kernel_size=3,
-            stride: int = 1
-        ):
-        super().__init__()
-        pad = (kernel_size-1)//2
-        assert order > 0, "order must be > 0"
-        self.layers = nn.ModuleList()
-        conv_op = my_import(conv)
-        for i in range(1, order+1):
-            modules = [
-                PolyActivation(order),
-                conv_op(in_channels=in_channels, out_channels=out_channels, padding=pad, stride=stride)
-            ]
-            if i > 1:
-                modules.append(
-                    PolyBrancher(in_channels=out_channels)
-                )
-            seq = nn.Sequential(*modules)
-            self.layers.append(seq)
-    
-    def forward(self, x):
-        output = None
-        for layer in self.layers:
-            out = layer(x)
-            if output is None:
-                output = out
-                continue
-            output = torch.add(output, out)
-        return output
-    
-class PolyBlock_Factor(nn.Module):
-    def __init__(self, 
-            order: int, 
-            in_channels: int, 
-            out_channels: int, 
-            conv: str = "Conv", 
-            kernel_size=3,
-            stride: int = 1
-        ):
-        super().__init__()
-        pad = (kernel_size-1)//2
-        assert order > 0, "order must be > 0"
-        self.layers = nn.ModuleList()
-        conv_op = my_import(conv)
-        for i in range(1, order+1):
-            modules = [
-                PolyActivation(order),
-                conv_op(in_channels=in_channels, out_channels=out_channels, padding=pad, stride=stride)
-            ]
-            if i > 1:
-                modules.append(
-                    PolyBrancher(in_channels=out_channels)
-                )
-            seq = nn.Sequential(*modules)
-            self.layers.append(seq)
-    
-    def forward(self, x):
-        first = None
-        output = None
-        for i, layer in enumerate(self.layers):
-            out = layer(x)
-            if i == 0:
-                first = out
-                continue
-            if output is None:
-                output = out
-                continue
-            output = torch.add(output, out)
-        return first * output
+  def __init__(self, in_channels: int, out_channels: int, order: int, stride: int = 1):
+    super().__init__()
+    self.order = order
+    self.conv = nn.Conv2d(in_channels, out_channels, 3, stride=stride)
+    self.ch_maxpool = nn.MaxPool3d((in_channels, 1, 1), stride=(in_channels, 1, 1))
+  def forward(self, x):
+    std = torch.std(x)
+    # print(torch.max(x))
+    x = torch.clip(x, -3*std, 3*std)
+    # print(torch.max(x))
+    x_pow = torch.pow(x, self.order)
+    # print(torch.max(x_pow))
+    norm = self.ch_maxpool(torch.abs(x_pow))
+    x_normed = x_pow/(norm + 1e-7)
+    # print(torch.max(x_normed))
+    out = self.conv(x_normed)
+    return out
 
 class InstanceNorm(nn.Module):
     def __init__(self, num_features):
@@ -359,3 +279,25 @@ class MCDropout(nn.Module):
         self.dropout = ModuleStateController.mcdropout_op()(p=p)
     def forward(self, x):
         return self.dropout(x)
+
+class NonLinearity(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.coefficiants = nn.ParameterList([nn.Parameter(torch.tensor([x], requires_grad=True)) for x in 
+                                              [0., 1., 0., 0., 0.]])
+        self.powers = nn.ParameterList([0., 1., 2., 3., 4.])
+        import uuid
+        self.id = str(uuid.uuid4())[0:5]
+        self.iters = 0
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        return self.relu(x)
+        result = torch.zeros_like(x)
+        for co, pow in zip(self.coefficiants, self.powers):
+            result = torch.add(result, torch.mul(co, torch.pow(x, pow)))
+        if self.iters % 100 == 0:
+            torch.save(self.powers, f"/home/andrew.heschl/Documents/599_Architecture_Project/nnunetv2/training/out/nonlin_p_{self.id}.pth")
+            torch.save(self.coefficiants, f"/home/andrew.heschl/Documents/599_Architecture_Project/nnunetv2/training/out/nonlin_c_{self.id}.pth")
+        self.iters += 1
+        return self.relu(result)

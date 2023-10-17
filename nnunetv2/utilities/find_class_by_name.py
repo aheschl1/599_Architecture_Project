@@ -27,6 +27,9 @@ def my_import(class_name:str, dropout_package:str = 'torch.nn'):
     if class_name == 'UpsamplingConv':
         from nnunetv2.training.models.utils import UpsamplingConv
         return UpsamplingConv
+    elif class_name == "NonLinearity":
+        from nnunetv2.training.models.utils import NonLinearity
+        return NonLinearity
     elif class_name == "PolyBlock":
         from nnunetv2.training.models.utils import PolyBlock
         return PolyBlock
@@ -120,12 +123,9 @@ def my_import(class_name:str, dropout_package:str = 'torch.nn'):
     elif class_name == "MCDropout":
         from nnunetv2.training.models.utils import MCDropout
         return MCDropout 
-    elif class_name == "PolyBlock_Sum":
-        from nnunetv2.training.models.utils import PolyBlock_Sum
-        return PolyBlock_Sum
-    elif class_name == "PolyBlock_Factor":
-        from nnunetv2.training.models.utils import PolyBlock_Factor
-        return PolyBlock_Factor
+    elif class_name == "PolyWrapper":
+        from nnunetv2.training.models.utils import PolyWrapper
+        return PolyWrapper
         
     else:
         module = importlib.import_module(dropout_package)
