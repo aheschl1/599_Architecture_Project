@@ -126,6 +126,8 @@ def my_import(class_name:str, dropout_package:str = 'torch.nn'):
     elif class_name == "PolyWrapper":
         from nnunetv2.training.models.utils import PolyWrapper
         return PolyWrapper
+    elif class_name == "DecoderBlock":
+        from nnunetv2.training.models.utils import DecoderBlock
         
     else:
         module = importlib.import_module(dropout_package)

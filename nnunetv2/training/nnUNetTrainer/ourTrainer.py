@@ -12,7 +12,6 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 from nnunetv2.training.models.model_generator import ModelGenerator
 from nnunetv2.training.models.utils import ModuleStateController
-from monai.losses import DiceCELoss, DiceLoss
 
 class ourTrainer(nnUNetTrainer):
 

@@ -189,9 +189,9 @@ class nnUNetTrainer(object):
         ### inference things
         self.inference_allowed_mirroring_axes = None  # this variable is set in
         # self.configure_rotation_dummyDA_mirroring_and_inital_patch_size and will be saved in checkpoints
-
+        
         ### checkpoint saving stuff
-        self.save_every = 10
+        self.save_every = 100
         self.disable_checkpointing = False
 
         ## DDP batch size and oversampling can differ between workers and needs adaptation

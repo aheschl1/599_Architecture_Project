@@ -1,29 +1,25 @@
 {
     "LogKwargs":{
-        "group":"poly v2",
-        "architecture":"poly fact",
-        "base":"XModule",
-        "max features":320
+        "architecture":"UNet",
+        "base":"Conv2d"
     },
     "Encoder":[
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":1,
                 "out_channels":32,
-                "stride":1,
-                "order": 3
+                "stride":1
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":32}},
         {"ComponentClass":"LeakyReLU", "args":{"inplace":true}},
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":32,
                 "out_channels":32,
-                "stride":1,
-                "order": 3
+                "stride":1
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":32}},
@@ -33,23 +29,21 @@
             "store_out":"skipped_0"
         },
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":32,
                 "out_channels":64,
-                "stride":2,
-                "order": 3
+                "stride":2
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":32}},
         {"ComponentClass":"LeakyReLU", "args":{"inplace":true}},
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":64,
                 "out_channels":64,
-                "stride":1,
-                "order": 3
+                "stride":1
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":64}},
@@ -59,67 +53,61 @@
             "store_out":"skipped_1"
         },        
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":64,
                 "out_channels":128,
-                "stride":2,
-                "order": 3
+                "stride":2
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":64}},
         {"ComponentClass":"LeakyReLU", "args":{"inplace":true}},
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":128,
                 "out_channels":128,
-                "stride":1,
-                "order": 3
+                "stride":1
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":128}},
         {"ComponentClass":"LeakyReLU", "args":{"inplace":true}, "store_out":"skipped_2"},
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":128,
                 "out_channels":256,
-                "stride":2,
-                "order": 3
+                "stride":2
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":128}},
         {"ComponentClass":"LeakyReLU", "args":{"inplace":true}},
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":256,
                 "out_channels":256,
-                "stride":1,
-                "order": 3
+                "stride":1
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":256}},
         {"ComponentClass":"LeakyReLU", "args":{"inplace":true}, "store_out":"skipped_3"},
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":256,
                 "out_channels":320,
-                "stride":2,
-                "order": 3
+                "stride":2
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":256}},
         {"ComponentClass":"LeakyReLU", "args":{"inplace":true}},
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":320,
                 "out_channels":320,
-                "stride":1,
-                "order": 3
+                "stride":1
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":256}},
@@ -127,23 +115,21 @@
     ],
     "Middle":[
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":320,
                 "out_channels":320,
-                "stride":2,
-                "order": 3
+                "stride":2
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":512}},
         {"ComponentClass":"LeakyReLU", "args":{"inplace":true}},
         {
-            "ComponentClass":"PolyBlock_Factor",
+            "ComponentClass":"Conv",
             "args":{
                 "in_channels":320,
                 "out_channels":320,
-                "stride":1,
-                "order": 3
+                "stride":1
             }
         },
         {"ComponentClass":"InstanceNorm", "args":{"num_features":512}},
@@ -240,7 +226,6 @@
                     ]
                 }
             },
-            "store_out":"sakdjfsal",
             "forward_in":{"skipped_4":"skipped_1"}
         },
         {
