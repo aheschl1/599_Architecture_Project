@@ -123,7 +123,7 @@ def my_import(class_name:str, dropout_package:str = 'torch.nn'):
     elif class_name == "MCDropout":
         from nnunetv2.training.models.utils import MCDropout
         return MCDropout 
-    elif class_name == "PolyWrapper":
+    elif class_name in ["Poly", "PolyWrapper"]:
         from nnunetv2.training.models.utils import PolyWrapper
         return PolyWrapper
     elif class_name == "DecoderBlock":

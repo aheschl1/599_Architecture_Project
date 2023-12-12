@@ -2,11 +2,11 @@ import math
 from typing import List, Dict
 
 from einops.layers.torch import Reduce
-from src.json_models.src.model_builder import ModelBuilder
+from nnunetv2.training.models.model_builder import ModelBuilder
 import torch.nn as nn
 import torch
 
-from src.json_models.src.utils import my_import
+from nnunetv2.utilities.find_class_by_name import my_import
 
 CONCAT = 'concat'
 ADD = 'add'
